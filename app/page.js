@@ -2,7 +2,7 @@
 import styles from "./page.module.css";
 import {
   Box, Button, Grid, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, InputLeftAddon, Image, PinInput, PinInputField, HStack,
-  Text, useDisclosure, useToken, Stepper, Step, StepIndicator, StepStatus, Progress, StepIcon, useSteps, StepNumber, StepTitle, StepDescription, StepSeparator, Icon, Input, InputGroup, Flex, Divider, InputLeftElement, Alert, AlertIcon, AlertTitle, AlertDescription
+  Text, useDisclosure, useToken, Stepper, Step, StepIndicator, StepStatus, Progress, StepIcon, useSteps, StepNumber, StepTitle, StepDescription, StepSeparator, Icon, Input, InputGroup, Flex, Divider, InputLeftElement, Alert, AlertIcon, AlertTitle, AlertDescription, Collapse
 } from "@chakra-ui/react";
 import { AnimatePresence, motion, Reorder } from "framer-motion"
 import hexToRgba from 'hex-to-rgba'
@@ -12,11 +12,15 @@ import { CiDiscount1 } from "react-icons/ci";
 import { IoMdCloseCircle } from "react-icons/io";
 import TypewriterEffect from "./components/TypewriterEffect";
 import { stepsContent, steps, savedAddress as savedAddr, savedCards as cards } from "./components/data"
+import { useMediaQuery } from "react-responsive";
+import { OrderSummary } from "./components/Commons";
+import { FaAngleDown } from "react-icons/fa6";
 
 
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
   const [mainColor] = useToken('colors', ['teal.50']);
   const { activeStep, isActiveStep, isCompleteStep, isIncompleteStep, setActiveStep } = useSteps({
     index: 0,
@@ -32,6 +36,7 @@ export default function Home() {
   const [selectedAddress, setSelectedAddress] = useState(savedAddr[0].id);
   const [selectedCard, setSelectedCard] = useState(cards[0].cardId);
   const [savedCards, setSavedCards] = useState(cards);
+  const [collapseSummary, setCollapseSummary] = useState(false)
   const nextStep = (step) => {
     if (step === 0) {
       if (!otpStep) {
@@ -79,7 +84,7 @@ export default function Home() {
   return (
     <Box width={'100%'} height={'100vh'} display={'grid'} placeItems={'center'}>
       <Button colorScheme={'teal'} mb={5} onClick={onOpen}>Launch Demo</Button>
-      <Modal onClose={onClose} isOpen={isOpen} motionPreset="scale" size={'xl'}>
+      <Modal onClose={onClose} isOpen={isOpen} motionPreset="scale" size={isMobile ? 'full' : 'xl'}>
         <ModalOverlay>
           <ModalContent w={'100%'} maxW={'880px'}>
             <motion.div initial={{ opacity: 0, x: -10 }} animate={isOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: .5 }}>
@@ -136,10 +141,10 @@ export default function Home() {
               </Button>
               <AnimatePresence mode="wait">
 
-                <Grid templateColumns={'60% 40%'} h={'100%'}>
+                <Grid templateColumns={isMobile ? '1fr' : '60% 40%'} h={'100%'}>
                   <motion.div initial={{ x: -15 }} animate={isOpen ? { x: 0 } : { x: -15 }} exit={{ x: 15 }} transition={{ duration: .2 }}>
-                    <Box bg={'white'} px={3} py={2} borderLeftRadius={'lg'} h={'100%'} pb={5}>
-                      <Text fontSize={'xl'} as={'b'}>Orbis Shop</Text>
+                    <Box bg={!isMobile && 'white'} px={3} py={2} borderLeftRadius={'lg'} h={'100%'} pb={5}>
+                      <Text fontSize={'xl'} as={'b'}>Orbis Shop {isMobile + 'isMobile'}</Text>
                       <Box position='relative' mt={3}>
                         <Stepper index={activeStep}>
                           {steps.map((step, index) => (
@@ -148,30 +153,59 @@ export default function Home() {
                               <Step key={index}>
 
                                 <StepStatus
-                                  complete={<Box flexShrink='0' display={'flex'} alignItems={'center'} gap={2}>
+                                  complete={<Box flexShrink='0' display={'flex'} alignItems={'center'} gap={!!isMobile ? 0 : 2} flexDirection={isMobile && 'column'}>
                                     <Icon as={step.icon} fill={'green'} boxSize={8}></Icon>
                                     <Text color={'green'}>{step.title}</Text>
                                   </Box>}
-                                  incomplete={<Box flexShrink='0' display={'flex'} alignItems={'center'} gap={2}>
+                                  incomplete={<Box flexShrink='0' display={'flex'} alignItems={'center'} gap={!!isMobile ? 0 : 2} flexDirection={isMobile && 'column'}>
                                     <Icon as={step.icon} fill={'black'} boxSize={8}></Icon>
                                     <StepTitle color={'black'}> {step.title}</StepTitle>
                                   </Box>}
-                                  active={<Box flexShrink='0' display={'flex'} alignItems={'center'} gap={2}>
+                                  active={<Box flexShrink='0' display={'flex'} alignItems={'center'} gap={!!isMobile ? 0 : 2} flexDirection={isMobile && 'column'}>
                                     <Icon as={step.icon} fill={'blue.500'} boxSize={8}></Icon>
                                     <StepTitle color={'blue.500'}> {step.title}</StepTitle>
                                   </Box>}
                                 />
-
-
                                 <StepSeparator />
                               </Step>
                           ))}
                         </Stepper>
                       </Box>
                       {
+                        !!isMobile && <Box bg={'white'} px={3} py={2} mt={4} rounded={3}>
+                          <motion.header initial={false} onClick={() => setCollapseSummary(!collapseSummary)}>
+                            <Flex alignItems={'center'} justifyContent={'space-between'}>
+                              <Text display={'flex'} alignItems={'center'} gap={2} cursor={'pointer'}>
+                                <Icon as={MdOutlineShoppingCart}></Icon>
+                                Order Summary <Icon as={FaAngleDown}></Icon>
+                              </Text>
+                              <Text>$259</Text>
+                            </Flex>
+                          </motion.header>
+                          <AnimatePresence initial={false}>{
+                            !!collapseSummary && <motion.section key="content"
+                              initial="collapsed"
+                              animate="open"
+                              exit="collapsed"
+                              variants={{
+                                open: { opacity: 1, height: "auto" },
+                                collapsed: { opacity: 0, height: 0, overflow: 'hidden' }
+                              }}
+                              transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}>
+                              <Fragment>
+                                <OrderSummary></OrderSummary>
+                              </Fragment>
+                            </motion.section>
+                          }
+
+
+                          </AnimatePresence>
+                        </Box>
+                      }
+                      {
                         activeStep === 0 && !otpStep && (
 
-                          <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2}>
+                          <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2} bg={!!isMobile && 'white'} rounded={3}>
                             <Text mb={3} as={'b'} fontSize={'xl'}>Enter Mobile Number</Text>
                             <InputGroup>
                               <InputLeftElement w={'100%'} justifyContent={'start'} px={3}>
@@ -299,42 +333,31 @@ export default function Home() {
                       }
                     </Box>
                   </motion.div>
-                  <motion.div initial={{ x: 15 }} animate={isOpen ? { x: 0 } : { x: 15 }} exit={{ x: -15 }} transition={{ duration: .2 }}>
-                    <Box p={3}>
-                      <Box rounded={'lg'} bg={'whiteAlpha.900'} py={2} px={3}>
-                        <Text>
-                          <Icon as={MdOutlineShoppingCart} mr={2}></Icon>
-                          Order Summary
-                        </Text>
-                        <Flex dir="column" justify={'center'} alignItems={'center'} mt={3}>
-                          <Image src={'https://cdn.shopify.com/s/files/1/0057/8938/4802/products/wave-call-3.png?v=1685530085'} w={'100px'} h={'50px'}></Image>
-                          <Text fontSize={'sm'} color={'gray.800'}>{`boAt Wave Call | Bluetooth Calling Smartwatch with 1.69" (4.29 cm) HD Curved Display, 150+ Watch Faces, Heart Rate & SPO2 Monitoring - Blue`}</Text>
-                        </Flex>
-                        <Flex justify={'space-between'} mt={3}>
-                          <Text fontSize={'md'} color={'gray.900'}>Subtotal</Text>
-                          <Text fontSize={'md'} color={'gray.900'}>$259</Text>
-                        </Flex>
-                        <Flex justify={'space-between'} mt={3}>
-                          <Text>Shipping</Text>
-                          <Text>Free</Text>
-                        </Flex>
-                        <Divider mt={3}></Divider>
-                        <Flex justify={'space-between'} mt={3}>
-                          <Text as={'b'}>Total</Text>
-                          <Text as={'b'}>$259</Text>
-                        </Flex>
+
+                  {
+                    !isMobile &&
+
+                    <motion.div initial={{ x: 15 }} animate={isOpen ? { x: 0 } : { x: 15 }} exit={{ x: -15 }} transition={{ duration: .2 }}>
+                      <Box p={3}>
+                        <Box rounded={'lg'} bg={'whiteAlpha.900'} py={2} px={3}>
+                          <Text>
+                            <Icon as={MdOutlineShoppingCart} mr={2}></Icon>
+                            Order Summary
+                          </Text>
+                          <OrderSummary></OrderSummary>
+                        </Box>
+                        <Box rounded={'lg'} bg={'whiteAlpha.900'} py={2} px={3} mt={5}>
+                          <InputGroup>
+                            <InputLeftElement>
+                              <Icon as={CiDiscount1} boxSize={8} ></Icon>
+                            </InputLeftElement>
+                            <Input border={'1px dashed'} _focusVisible={{ border: '1px dashed' }}></Input>
+                          </InputGroup>
+                          <Text textAlign={'right'} mt={1} fontSize={12}>Have a gift card?</Text>
+                        </Box>
                       </Box>
-                      <Box rounded={'lg'} bg={'whiteAlpha.900'} py={2} px={3} mt={5}>
-                        <InputGroup>
-                          <InputLeftElement>
-                            <Icon as={CiDiscount1} boxSize={8} ></Icon>
-                          </InputLeftElement>
-                          <Input border={'1px dashed'} _focusVisible={{ border: '1px dashed' }}></Input>
-                        </InputGroup>
-                        <Text textAlign={'right'} mt={1} fontSize={12}>Have a gift card?</Text>
-                      </Box>
-                    </Box>
-                  </motion.div>
+                    </motion.div>
+                  }
                 </Grid>
 
               </AnimatePresence>
