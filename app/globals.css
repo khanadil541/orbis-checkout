@@ -105,3 +105,11 @@ a {
     color-scheme: dark;
   }
 }
+
+ul,
+li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+ 
+}
