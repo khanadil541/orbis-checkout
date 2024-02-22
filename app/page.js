@@ -143,7 +143,7 @@ export default function Home() {
                       <Box position='relative' mt={3}>
                         <Stepper index={activeStep}>
                           {steps.map((step, index) => (
-                            (index === steps.length - 1) ? <Fragment></Fragment> :
+                            (index === steps.length - 1) ? <Fragment key={index}></Fragment> :
 
                               <Step key={index}>
 
@@ -183,7 +183,7 @@ export default function Home() {
 
                             <Button size={'lg'} mt={2} bg={'black'} color={'white'}>Continue <Icon as={MdArrowRightAlt} ml={3}></Icon></Button>
                             <Text fontSize={'sm'} width={'100%'} maxW={'350px'} color={'gray.500'} mt={1}>
-                              By proceeding, I accept that I have read and understood the Gokwik's Privacy Policy and T&C
+                              {`By proceeding, I accept that I have read and understood the Orbis's Privacy Policy and T&C`}
 
                             </Text>
                           </Box>
@@ -205,7 +205,7 @@ export default function Home() {
 
                             <Button size={'lg'} mt={2} bg={'black'} color={'white'}>Continue <Icon as={MdArrowRightAlt} ml={3}></Icon></Button>
                             <Text fontSize={'sm'} width={'100%'} maxW={'350px'} color={'gray.500'} mt={1}>
-                              By proceeding, I accept that I have read and understood the Gokwik's Privacy Policy and T&C
+                              {`By proceeding, I accept that I have read and understood the Gokwik's Privacy Policy and T&C`}
 
                             </Text>
                           </Box>
@@ -308,7 +308,7 @@ export default function Home() {
                         </Text>
                         <Flex dir="column" justify={'center'} alignItems={'center'} mt={3}>
                           <Image src={'https://cdn.shopify.com/s/files/1/0057/8938/4802/products/wave-call-3.png?v=1685530085'} w={'100px'} h={'50px'}></Image>
-                          <Text fontSize={'sm'} color={'gray.800'}>boAt Wave Call | Bluetooth Calling Smartwatch with 1.69" (4.29 cm) HD Curved Display, 150+ Watch Faces, Heart Rate & SPO2 Monitoring - Blue</Text>
+                          <Text fontSize={'sm'} color={'gray.800'}>{`boAt Wave Call | Bluetooth Calling Smartwatch with 1.69" (4.29 cm) HD Curved Display, 150+ Watch Faces, Heart Rate & SPO2 Monitoring - Blue`}</Text>
                         </Flex>
                         <Flex justify={'space-between'} mt={3}>
                           <Text fontSize={'md'} color={'gray.900'}>Subtotal</Text>
