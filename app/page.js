@@ -5,7 +5,7 @@ import {
   Text, useDisclosure, useToken, Stepper, Step, StepIndicator, StepStatus, Progress, StepIcon, useSteps, StepNumber, StepTitle, StepDescription, StepSeparator, Icon, Input, InputGroup, Flex, Divider, InputLeftElement, Alert, AlertIcon, AlertTitle, AlertDescription, Collapse
 } from "@chakra-ui/react";
 import { AnimatePresence, motion, Reorder } from "framer-motion"
-import hexToRgba from 'hex-to-rgba'
+
 import { Fragment, useState } from "react";
 import { MdArrowRightAlt, MdArrowBack, MdOutlineShoppingCart, MdAdd, MdDelete, MdEdit } from "react-icons/md";
 import { CiDiscount1 } from "react-icons/ci";
@@ -13,15 +13,16 @@ import { IoMdCloseCircle } from "react-icons/io";
 import TypewriterEffect from "./components/TypewriterEffect";
 import { stepsContent, steps, savedAddress as savedAddr, savedCards as cards } from "./components/data"
 import { useMediaQuery } from "react-responsive";
-import { OrderSummary } from "./components/Commons";
+import { OrderSummary, CheckoutTour } from "./components/Commons";
 import { FaAngleDown } from "react-icons/fa6";
+//import {CheckoutTour} from "./components/CheckoutTour";
 
 
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
-  const [mainColor] = useToken('colors', ['teal.50']);
+
   const { activeStep, isActiveStep, isCompleteStep, isIncompleteStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
@@ -87,53 +88,7 @@ export default function Home() {
       <Modal onClose={onClose} isOpen={isOpen} motionPreset="scale" size={isMobile ? 'full' : 'xl'}>
         <ModalOverlay>
           <ModalContent w={'100%'} maxW={'880px'}>
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={isOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: .5 }}>
-              <Box position={'absolute'} left={'-280px'} w={'260px'} top={0} transform={'translate(10, 10)'} bg={hexToRgba(mainColor, '0.3')} p={5} borderRadius={5}>
-                {
-                  !otpStep && stepsContent.HEAD[activeStep.toString()] && (() => {
-                    return <Fragment>
-                      <motion.div initial={{ opacity: 0, x: -10 }} animate={isOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: .5 }}>
-                        <Text color={'white'} as={'b'} fontSize={20} lineHeight={1}>{stepsContent.HEAD[activeStep.toString()]}</Text>
-                        <Text color={'gray.200'}>
-                          {stepsContent.TEXT[activeStep.toString()]}
-                        </Text>
-                      </motion.div>
-                    </Fragment>
-                  })()
-
-                }
-                {
-                  !!otpStep && !!activeStep.toString() && (() => {
-                    return <Fragment>
-                      <motion.div initial={{ opacity: 0, x: -10 }} animate={isOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} exit={{ opacity: 0, x: 15 }} transition={{ duration: .5 }}>
-                        <Text color={'white'} as={'b'} fontSize={20} lineHeight={1}>{stepsContent.HEAD.otpStep}</Text>
-                        <Text color={'gray.200'}>
-                          {stepsContent.TEXT.otpStep}
-                        </Text>
-                      </motion.div>
-                    </Fragment>
-                  })()
-
-
-                }
-
-                <Box display={'flex'} justifyContent={'space-between'}>
-                  {
-                    activeStep !== 0 && <Button variant={'ghost'} p={0} onClick={() => setActiveStep(activeStep - 1)} _hover={{ opacity: .3 }} >
-                      <Icon as={MdArrowBack}> </Icon>
-                      Prev
-                    </Button>
-                  }
-                  {
-                    activeStep !== steps.length - 1 && <Button variant={'ghost'} p={0} onClick={() => nextStep(activeStep)} _hover={{ opacity: .3 }}>
-                      Next
-                      <Icon as={MdArrowRightAlt}></Icon>
-                    </Button>
-                  }
-
-                </Box>
-              </Box>
-            </motion.div>
+            {!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep}></CheckoutTour>}
 
             <ModalBody bg={'gray.100'} rounded={'lg'} p={0}>
               <Button rounded={'50%'} position={'absolute'} right={0} p={0} onClick={onClose}>
@@ -205,49 +160,55 @@ export default function Home() {
                       {
                         activeStep === 0 && !otpStep && (
 
-                          <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2} bg={!!isMobile && 'white'} rounded={3}>
-                            <Text mb={3} as={'b'} fontSize={'xl'}>Enter Mobile Number</Text>
-                            <InputGroup>
-                              <InputLeftElement w={'100%'} justifyContent={'start'} px={3}>
-                                +91 <TypewriterEffect text={text} delay={50} />
+                          <Fragment>
+                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
+                            <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2} bg={!!isMobile && 'white'} rounded={3}>
+                              <Text mb={3} as={'b'} fontSize={'xl'}>Enter Mobile Number</Text>
+                              <InputGroup>
+                                <InputLeftElement w={'100%'} justifyContent={'start'} px={3}>
+                                  +91 <TypewriterEffect text={text} delay={50} />
 
-                              </InputLeftElement>
-                              <Input></Input>
-                            </InputGroup>
+                                </InputLeftElement>
+                                <Input></Input>
+                              </InputGroup>
 
-                            <Button size={'lg'} mt={2} bg={'black'} color={'white'}>Continue <Icon as={MdArrowRightAlt} ml={3}></Icon></Button>
-                            <Text fontSize={'sm'} width={'100%'} maxW={'350px'} color={'gray.500'} mt={1}>
-                              {`By proceeding, I accept that I have read and understood the Orbis's Privacy Policy and T&C`}
+                              <Button size={'lg'} mt={2} bg={'black'} color={'white'}>Continue <Icon as={MdArrowRightAlt} ml={3}></Icon></Button>
+                              <Text fontSize={'sm'} width={'100%'} maxW={'350px'} color={'gray.500'} mt={1}>
+                                {`By proceeding, I accept that I have read and understood the Orbis's Privacy Policy and T&C`}
 
-                            </Text>
-                          </Box>
+                              </Text>
+                            </Box>
+                          </Fragment>
                         )
                       }
                       {
                         activeStep === 0 && !!otpStep && (
+                          <Fragment>
+                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
+                            <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2} bg={!!isMobile && 'white'} rounded={3}>
+                              <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Enter the one-time verification code sent to your mobile to log into your secure account.</Text>
+                              <HStack>
+                                <PinInput type='alphanumeric' defaultValue={otp} value={otp}>
+                                  <PinInputField />
+                                  <PinInputField />
+                                  <PinInputField />
+                                  <PinInputField />
+                                </PinInput>
+                              </HStack>
 
-                          <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2}>
-                            <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Enter the one-time verification code sent to your mobile to log into your secure account.</Text>
-                            <HStack>
-                              <PinInput type='alphanumeric' defaultValue={otp} value={otp}>
-                                <PinInputField />
-                                <PinInputField />
-                                <PinInputField />
-                                <PinInputField />
-                              </PinInput>
-                            </HStack>
+                              <Button size={'lg'} mt={2} bg={'black'} color={'white'}>Continue <Icon as={MdArrowRightAlt} ml={3}></Icon></Button>
+                              <Text fontSize={'sm'} width={'100%'} maxW={'350px'} color={'gray.500'} mt={1}>
+                                {`By proceeding, I accept that I have read and understood the Gokwik's Privacy Policy and T&C`}
 
-                            <Button size={'lg'} mt={2} bg={'black'} color={'white'}>Continue <Icon as={MdArrowRightAlt} ml={3}></Icon></Button>
-                            <Text fontSize={'sm'} width={'100%'} maxW={'350px'} color={'gray.500'} mt={1}>
-                              {`By proceeding, I accept that I have read and understood the Gokwik's Privacy Policy and T&C`}
-
-                            </Text>
-                          </Box>
+                              </Text>
+                            </Box>
+                          </Fragment>
                         )
                       }
                       {
                         activeStep === 1 && (
                           <Box display={'flex'} flexDirection={'column'} p={3} mt={2}>
+                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
                             <motion.div initial={{ x: -15 }} animate={isOpen ? { x: 0 } : { x: -15 }} exit={{ x: 15 }} transition={{ duration: .2 }}>
                               <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Shipping Address</Text>
                               <Reorder.Group axis="y" values={savedAddress}>
@@ -283,6 +244,7 @@ export default function Home() {
                       {
                         activeStep === 2 && (
                           <Box display={'flex'} flexDirection={'column'} p={3} mt={2}>
+                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
                             <motion.div initial={{ x: -15 }} animate={isOpen ? { x: 0 } : { x: -15 }} exit={{ x: 15 }} transition={{ duration: .2 }}>
                               <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Payment</Text>
                               <Reorder.Group axis="y" values={selectedCard}>
