@@ -21,7 +21,9 @@ import { FaAngleDown } from "react-icons/fa6";
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const isMobile = useMediaQuery({ query: '(max-width: 600px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTab = useMediaQuery({query: '(max-width: 1467px)'});
+  const isDesktop = useMediaQuery({query: '(min-width: 1467px)'})
 
   const { activeStep, isActiveStep, isCompleteStep, isIncompleteStep, setActiveStep } = useSteps({
     index: 0,
@@ -88,7 +90,7 @@ export default function Home() {
       <Modal onClose={onClose} isOpen={isOpen} motionPreset="scale" size={isMobile ? 'full' : 'xl'}>
         <ModalOverlay>
           <ModalContent w={'100%'} maxW={'880px'}>
-            {!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep}></CheckoutTour>}
+            {!(isMobile || isTab) && <Fragment><CheckoutTour isOpen={isOpen} isTab={isTab} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isTab || isMobile}></CheckoutTour></Fragment>}
 
             <ModalBody bg={'gray.100'} rounded={'lg'} p={0}>
               <Button rounded={'50%'} position={'absolute'} right={0} p={0} onClick={onClose}>
@@ -99,7 +101,7 @@ export default function Home() {
                 <Grid templateColumns={isMobile ? '1fr' : '60% 40%'} h={'100%'}>
                   <motion.div initial={{ x: -15 }} animate={isOpen ? { x: 0 } : { x: -15 }} exit={{ x: 15 }} transition={{ duration: .2 }}>
                     <Box bg={!isMobile && 'white'} px={3} py={2} borderLeftRadius={'lg'} h={'100%'} pb={5}>
-                      <Text fontSize={'xl'} as={'b'}>Orbis Shop {isMobile + 'isMobile'}</Text>
+                      <Text fontSize={'xl'} as={'b'}>Orbis Shop</Text>
                       <Box position='relative' mt={3}>
                         <Stepper index={activeStep}>
                           {steps.map((step, index) => (
@@ -161,7 +163,7 @@ export default function Home() {
                         activeStep === 0 && !otpStep && (
 
                           <Fragment>
-                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
+                            {(!!isMobile || !!isTab) && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile || isTab}></CheckoutTour>}
                             <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2} bg={!!isMobile && 'white'} rounded={3}>
                               <Text mb={3} as={'b'} fontSize={'xl'}>Enter Mobile Number</Text>
                               <InputGroup>
@@ -184,7 +186,7 @@ export default function Home() {
                       {
                         activeStep === 0 && !!otpStep && (
                           <Fragment>
-                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
+                            {(!!isMobile || !!isTab) && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile || isTab}></CheckoutTour>}
                             <Box display={'flex'} flexDirection={'column'} alignItems={'center'} p={3} mt={2} bg={!!isMobile && 'white'} rounded={3}>
                               <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Enter the one-time verification code sent to your mobile to log into your secure account.</Text>
                               <HStack>
@@ -208,7 +210,7 @@ export default function Home() {
                       {
                         activeStep === 1 && (
                           <Box display={'flex'} flexDirection={'column'} p={3} mt={2}>
-                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
+                            {(!!isMobile || !!isTab) && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile || isTab}></CheckoutTour>}
                             <motion.div initial={{ x: -15 }} animate={isOpen ? { x: 0 } : { x: -15 }} exit={{ x: 15 }} transition={{ duration: .2 }}>
                               <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Shipping Address</Text>
                               <Reorder.Group axis="y" values={savedAddress}>
@@ -244,7 +246,7 @@ export default function Home() {
                       {
                         activeStep === 2 && (
                           <Box display={'flex'} flexDirection={'column'} p={3} mt={2}>
-                            {!!isMobile && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile}></CheckoutTour>}
+                            {(!!isMobile || !!isTab) && <CheckoutTour isOpen={isOpen} otpStep={otpStep} activeStep={activeStep} setActiveStep={setActiveStep} nextStep={nextStep} isMobile={isMobile || isTab}></CheckoutTour>}
                             <motion.div initial={{ x: -15 }} animate={isOpen ? { x: 0 } : { x: -15 }} exit={{ x: 15 }} transition={{ duration: .2 }}>
                               <Text mb={3} as={'b'} fontSize={'lg'} w={'85%'}>Payment</Text>
                               <Reorder.Group axis="y" values={selectedCard}>
@@ -288,7 +290,7 @@ export default function Home() {
                               Order Confirmed
                             </AlertTitle>
                             <AlertDescription>
-                              We sent an email to registered email address with your order confirmation and receipt.
+                              We have sent an email to registered email address with your order confirmation and receipt.
                             </AlertDescription>
                           </Alert>
                         )
